@@ -1,0 +1,34 @@
+{% extends "portal/base.html" %}
+{% block title %}Overview{% endblock %}
+{% block page_name %}Overview{% endblock %}
+{% block content %}
+<section class="welcome-row">
+  <div><span class="eyebrow">YOUR CARE OVERVIEW</span><h1>Good to see you, {{ user.first_name|default:"there" }} <span class="wave">✳</span></h1><p>Here’s what’s happening across your workspace today.</p></div>
+  <a class="button button-primary" href="{% url 'portal:patient-create' %}"><span class="button-plus">+</span> Add a patient</a>
+</section>
+<section class="stat-grid" aria-label="Workspace statistics">
+  <article class="stat-card"><div class="stat-top"><span class="stat-icon mint">♡</span><span class="stat-caption">YOUR RECORDS</span></div><strong class="stat-number">{{ patient_count }}</strong><span class="stat-label">Patients in your care</span><a class="stat-link" href="{% url 'portal:patients' %}">View patients <span>→</span></a></article>
+  <article class="stat-card"><div class="stat-top"><span class="stat-icon lavender">✚</span><span class="stat-caption">SHARED DIRECTORY</span></div><strong class="stat-number">{{ doctor_count }}</strong><span class="stat-label">Doctors available</span><a class="stat-link" href="{% url 'portal:doctors' %}">Explore directory <span>→</span></a></article>
+  <article class="stat-card"><div class="stat-top"><span class="stat-icon peach">⇄</span><span class="stat-caption">COORDINATED CARE</span></div><strong class="stat-number">{{ assignment_count }}</strong><span class="stat-label">Active care assignments</span><a class="stat-link" href="{% url 'portal:assignments' %}">View care teams <span>→</span></a></article>
+</section>
+<section class="dashboard-grid">
+  <article class="panel">
+    <div class="panel-heading"><div><span class="eyebrow">PATIENT RECORDS</span><h2>Recently added</h2></div><a class="text-link" href="{% url 'portal:patients' %}">All patients <span>→</span></a></div>
+    {% if recent_patients %}
+    <div class="compact-list">
+      {% for patient in recent_patients %}<div class="compact-row"><span class="person-avatar avatar-{{ forloop.counter|divisibleby:2|yesno:'teal,blue' }}">{{ patient.name|slice:":1"|upper }}</span><span class="row-main"><strong>{{ patient.name }}</strong><small>{{ patient.get_gender_display }}{% if patient.age %} · {{ patient.age }} years{% endif %}</small></span><span class="row-date">{{ patient.created_at|date:"M j" }}</span><a class="row-arrow" href="{% url 'portal:patient-update' patient.pk %}" aria-label="Edit {{ patient.name }}">→</a></div>{% endfor %}
+    </div>
+    {% else %}<div class="empty-state compact-empty"><span class="empty-symbol">♡</span><strong>Your patient list starts here</strong><p>Add your first patient to keep their details close at hand.</p><a class="button button-secondary button-small" href="{% url 'portal:patient-create' %}">Add a patient</a></div>{% endif %}
+  </article>
+  <article class="panel activity-panel">
+    <div class="panel-heading"><div><span class="eyebrow">CARE COORDINATION</span><h2>Recent assignments</h2></div><a class="text-link" href="{% url 'portal:assignments' %}">See all <span>→</span></a></div>
+    {% if recent_assignments %}
+    <div class="compact-list">
+      {% for assignment in recent_assignments %}<div class="activity-row"><span class="activity-mark">⇄</span><span class="row-main"><strong>{{ assignment.patient.name }}</strong><small>with Dr. {{ assignment.doctor.name }}</small></span><span class="row-date">{{ assignment.assigned_at|date:"M j" }}</span></div>{% endfor %}
+    </div>
+    {% else %}<div class="empty-state compact-empty"><span class="empty-symbol">⇄</span><strong>Care works better together</strong><p>Connect one of your patients with a doctor from the directory.</p><a class="button button-secondary button-small" href="{% url 'portal:assignment-create' %}">Create assignment</a></div>{% endif %}
+    <div class="tip-card"><span class="tip-icon">✦</span><div><strong>A little more connected</strong><p>Assign doctors to a patient to keep their care team in sync.</p></div><a href="{% url 'portal:assignment-create' %}" aria-label="Create a care assignment">→</a></div>
+  </article>
+</section>
+<section class="welcome-banner"><div class="banner-mark">+</div><div><strong>Care starts with a clear picture.</strong><p>Your workspace keeps patient records and care teams together, in one place.</p></div><a href="{% url 'portal:patients' %}">Explore your workspace <span>→</span></a></section>
+{% endblock %}

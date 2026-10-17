@@ -1,0 +1,14 @@
+{% extends "portal/base.html" %}
+{% block title %}Care teams{% endblock %}
+{% block page_name %}Care teams{% endblock %}
+{% block content %}
+<section class="page-heading"><div><span class="eyebrow">CONNECTED CARE</span><h1>Care teams</h1><p>See which clinicians are connected to your patients.</p></div><a class="button button-primary" href="{% url 'portal:assignment-create' %}"><span class="button-plus">+</span> Assign a doctor</a></section>
+<section class="panel table-panel">
+  <div class="table-toolbar"><div><h2>Doctor assignments</h2><span class="result-count">{{ assignments|length }} assignment{{ assignments|length|pluralize }}</span></div></div>
+  {% if assignments %}
+  <div class="table-wrap"><table><thead><tr><th>PATIENT</th><th>CARE TEAM</th><th>SPECIALTY</th><th>ASSIGNED</th><th><span class="sr-only">Actions</span></th></tr></thead><tbody>
+  {% for assignment in assignments %}<tr><td><div class="table-person"><span class="person-avatar avatar-teal">{{ assignment.patient.name|slice:":1"|upper }}</span><span><strong>{{ assignment.patient.name }}</strong><small>Patient</small></span></div></td><td><div class="table-person doctor-cell"><span class="person-avatar doctor-avatar">{{ assignment.doctor.name|slice:":1"|upper }}</span><span><strong>Dr. {{ assignment.doctor.name }}</strong><small>{{ assignment.doctor.email }}</small></span></div></td><td><span class="specialty-pill">{{ assignment.doctor.specialization }}</span></td><td>{{ assignment.assigned_at|date:"M j, Y" }}</td><td><form method="post" action="{% url 'portal:assignment-delete' assignment.pk %}" onsubmit="return confirm('Remove this doctor assignment?');">{% csrf_token %}<button class="action-link danger-link" type="submit">Remove</button></form></td></tr>{% endfor %}
+  </tbody></table></div>
+  {% else %}<div class="empty-state"><span class="empty-symbol">⇄</span><strong>No care teams yet</strong><p>Start coordinating care by assigning a doctor to one of your patients.</p><a class="button button-secondary button-small" href="{% url 'portal:assignment-create' %}">Create an assignment</a></div>{% endif %}
+</section>
+{% endblock %}
